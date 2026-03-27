@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uva Bonita — Maridaje Musical</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&family=Instrument+Serif:ital@0;1&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#111110;
+  --paper:#F4F1EC;
+  --paper2:#EDE9E2;
+  --muted:#9A9590;
+  --accent:#E8836A;
+}
+
+html,body{height:100%;background:var(--paper);}
+
+body{
+  font-family:'DM Mono',monospace;
+  color:var(--ink);
+  background:var(--paper);
+}
+
+.wrap{
+  max-width:480px;
+  margin:0 auto;
+  padding:32px 24px 48px;
+  min-height:100vh;
+}
+
+/* ---- HEADER ---- */
+.header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  border-bottom:1px solid var(--ink);
+  padding-bottom:10px;
+  margin-bottom:28px;
+}
+
+.brand-name{
+  font-family:'Instrument Serif',serif;
+  font-size:28px;
+  font-weight:400;
+  letter-spacing:-0.5px;
+  line-height:1;
+}
+
+.brand-sub{
+  font-family:'DM Mono',monospace;
+  font-size:8px;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  font-weight:300;
+  text-align:right;
+  line-height:1.6;
+}
+
+/* ---- CEPA SELECTOR ---- */
+.cepas-label{
+  font-size:8px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);font-weight:300;margin-bottom:10px;
+}
+
+.cepas-grid{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-bottom:32px;
+}
+
+.cepa-tag{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  font-weight:400;
+  padding:5px 12px;
+  border:1px solid rgba(17,17,16,0.25);
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  transition:all 0.2s;
+  border-radius:0;
+}
+
+.cepa-tag:hover{
+  border-color:var(--ink);
+  color:var(--ink);
+}
+
+.cepa-tag.active{
+  background:var(--ink);
+  border-color:var(--ink);
+  color:var(--paper);
+}
+
+/* ---- PLAYER BLOCK ---- */
+.player-block{
+  margin-bottom:28px;
+  position:relative;
+}
+
+.fase-line{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.fase-num{
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);font-weight:300;
+}
+
+.fase-name{
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ink);font-weight:400;
+}
+
+.fase-line-rule{flex:1;height:1px;background:rgba(17,17,16,0.12);}
+
+/* Track display — editorial */
+.track-display{
+  border:1px solid var(--ink);
+  padding:20px 18px 16px;
+  margin-bottom:14px;
+  position:relative;
+  background:var(--paper);
+}
+
+.track-tag{
+  position:absolute;
+  top:-1px;right:14px;
+  font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--paper);
+  background:var(--ink);
+  padding:2px 8px;
+  font-weight:400;
+}
+
+.track-main{
+  font-family:'Instrument Serif',serif;
+  font-size:22px;font-weight:400;
+  line-height:1.15;
+  margin-bottom:4px;
+  font-style:italic;
+}
+
+.track-meta{
+  font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);font-weight:300;
+}
+
+/* Progress */
+.progress-area{margin-bottom:16px;}
+
+.prog-bg{
+  width:100%;height:1px;
+  background:rgba(17,17,16,0.15);
+  cursor:pointer;margin-bottom:6px;
+  position:relative;
+}
+
+.prog-fill{
+  height:1px;background:var(--ink);
+  transition:width 0.6s linear;
+  position:relative;
+}
+
+.prog-fill::after{
+  content:'';position:absolute;right:-4px;top:-3px;
+  width:7px;height:7px;
+  border-radius:50%;background:var(--ink);
+}
+
+.time-row{
+  display:flex;justify-content:space-between;
+  font-size:9px;color:var(--muted);font-weight:300;
+}
+
+/* Controls */
+.controls{
+  display:flex;align-items:center;gap:16px;
+}
+
+.ctrl{
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:11px;
+  padding:4px;transition:color 0.2s;
+  font-family:'DM Mono',monospace;letter-spacing:1px;
+}
+.ctrl:hover{color:var(--ink);}
+
+.play-btn{
+  width:36px;height:36px;
+  border:1px solid var(--ink);
+  background:transparent;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--ink);
+  transition:all 0.15s;
+  flex-shrink:0;
+}
+.play-btn:hover{background:var(--ink);color:var(--paper);}
+
+/* ---- NOTA BREVE ---- */
+.nota{
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.3px;
+  color:var(--muted);
+  line-height:1.8;
+  border-top:1px solid rgba(17,17,16,0.1);
+  padding-top:12px;
+  margin-bottom:28px;
+  font-weight:300;
+}
+
+.nota b{
+  font-weight:400;
+  color:var(--ink);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-size:9px;
+}
+
+/* ---- PLAYLIST ---- */
+.playlist-label{
+  font-size:8px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);font-weight:300;
+  margin-bottom:8px;
+}
+
+.phase-rows{margin-bottom:0;}
+
+.phase-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(17,17,16,0.08);
+  cursor:pointer;
+  transition:opacity 0.15s;
+}
+.phase-row:hover{opacity:0.6;}
+.phase-row:last-child{border-bottom:none;}
+
+.phase-row.active .pr-num{color:var(--accent);}
+.phase-row.active .pr-name{color:var(--ink);}
+
+.pr-num{
+  font-size:9px;color:rgba(17,17,16,0.2);
+  min-width:16px;font-weight:300;
+}
+
+.pr-info{flex:1;}
+
+.pr-name{
+  font-size:11px;color:rgba(17,17,16,0.5);
+  font-weight:400;text-transform:uppercase;letter-spacing:1px;
+}
+.phase-row.active .pr-name{color:var(--ink);}
+
+.pr-track{
+  font-size:9px;color:var(--muted);
+  font-weight:300;margin-top:2px;
+  font-style:italic;
+  font-family:'Instrument Serif',serif;
+  letter-spacing:0;font-size:11px;
+}
+
+.pr-dur{font-size:9px;color:rgba(17,17,16,0.2);font-weight:300;}
+
+/* Decorative dot accent */
+.dot-accent{
+  display:inline-block;
+  width:5px;height:5px;border-radius:50%;
+  background:var(--accent);
+  margin-right:6px;vertical-align:middle;
+}
+
+.yt-hidden{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div>
+      <div class="brand-name">Uva Bonita</div>
+    </div>
+    <div class="brand-sub">Maridaje<br>Musical</div>
+  </div>
+
+  <div class="cepas-label">Cepa</div>
+  <div class="cepas-grid" id="cepasGrid"></div>
+
+  <div class="player-block">
+    <div class="fase-line">
+      <span class="fase-num" id="faseNum">01</span>
+      <span class="fase-name" id="faseName">—</span>
+      <div class="fase-line-rule"></div>
+    </div>
+
+    <div class="track-display">
+      <div class="track-tag" id="trackTag">Now playing</div>
+      <div class="track-main" id="trackTitle">—</div>
+      <div class="track-meta" id="trackArtist">—</div>
+    </div>
+
+    <div class="progress-area">
+      <div class="prog-bg" onclick="seekClick(event)">
+        <div class="prog-fill" id="progFill" style="width:0%"></div>
+      </div>
+      <div class="time-row">
+        <span id="tCur">0:00</span>
+        <span id="tDur">–</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl" onclick="prevPhase()">← prev</button>
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="ctrl" onclick="nextPhase()">next →</button>
+    </div>
+  </div>
+
+  <div class="nota" id="nota"></div>
+
+  <div class="playlist-label">Recorrido</div>
+  <div class="phase-rows" id="phaseRows"></div>
+
+  <div class="yt-hidden"><div id="ytPlayer"></div></div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const CEPAS = [
+  {
+    id:'malbec', label:'Malbec',
+    phases:[
+      { name:'Primera copa',    track:'Zamba para no morir',   artist:'Mercedes Sosa',   ytId:'s1XgSScLbAs', dur:'3:42',
+        nota:'<b>Mendoza.</b> Altitud. Fruta oscura antes de que alguien hable.' },
+      { name:'En la mesa',      track:'Alfonsina y el mar',    artist:'Mercedes Sosa',   ytId:'BgkCEbuHO6c', dur:'4:10',
+        nota:'<b>Violeta. Ciruela. Silencio entre palabras.</b>' },
+      { name:'El final',        track:'Volver',                artist:'Carlos Gardel',   ytId:'_yp2z5EuCeM', dur:'2:58',
+        nota:'<b>No hay apuro.</b> El vaso casi vacío todavía tiene algo que decir.' },
+    ]
+  },
+  {
+    id:'torrontes', label:'Torrontés',
+    phases:[
+      { name:'Antes de servir', track:'La flor de la canela',  artist:'Chabuca Granda',  ytId:'cCgmFOC7Kcc', dur:'3:15',
+        nota:'<b>Jazmín. Rosa. La copa antes de tocarla.</b>' },
+      { name:'Primer sorbo',    track:'Bossa Nova ao vivo',    artist:'João Gilberto',   ytId:'Rz4OZpHrjqo', dur:'4:20',
+        nota:'<b>Fresco. Mineral.</b> Más seco de lo que el aroma prometía.' },
+      { name:'Larga tarde',     track:'España',                artist:'Chick Corea',     ytId:'jfwkYBtVLDQ', dur:'6:40',
+        nota:'<b>La Rioja. Verano.</b> Una conversación que se fue extendiendo sola.' },
+    ]
+  },
+  {
+    id:'semillon', label:'Sémillon',
+    phases:[
+      { name:'El rescate',      track:'Flamenco Sketches',     artist:'Miles Davis',     ytId:'gF8EyiTvaPU', dur:'9:32',
+        nota:'<b>Estaba acá antes.</b> Nadie le prestaba atención. Error.' },
+      { name:'Textura',         track:'Clair de Lune',         artist:'Debussy',         ytId:'4ASV7ETGF3A', dur:'5:10',
+        nota:'<b>Miel. Almendra. Algo parecido a la cera.</b>' },
+      { name:'Tarde dorada',    track:'Gymnopédie No.1',       artist:'Erik Satie',      ytId:'S-Xm7s9eGxU', dur:'3:05',
+        nota:'<b>Luz de las cinco.</b> El vino lleva crianza. Se nota.' },
+    ]
+  },
+  {
+    id:'criollagrande', label:'Criolla Grande',
+    phases:[
+      { name:'Mesa larga',      track:'La Yumba',              artist:'Osvaldo Pugliese',ytId:'Q9gVsJlW-5s', dur:'3:03',
+        nota:'<b>Domingo.</b> La botella sin etiqueta en el centro de la mesa.' },
+      { name:'Sin pretensiones',track:'El día que me quieras', artist:'Carlos Gardel',   ytId:'FZiXJXnVNGY', dur:'3:20',
+        nota:'<b>Fácil.</b> No compite con nada. Por eso gana.' },
+      { name:'Sobremesa',       track:'Angélica Lemos',        artist:'Atahualpa Yupanqui',ytId:'vj2MZJmIGAI',dur:'3:50',
+        nota:'<b>Nadie tiene apuro.</b> El vino ya terminó pero nadie se levantó.' },
+    ]
+  },
+  {
+    id:'criollachica', label:'Criolla Chica',
+    phases:[
+      { name:'Cuatro siglos',   track:'La vie en rose',        artist:'Édith Piaf',      ytId:'O5BHKB7MQGI', dur:'3:20',
+        nota:'<b>Llegó con los conquistadores.</b> Todavía está.' },
+      { name:'Acidez viva',     track:'Libertango',            artist:'Astor Piazzolla', ytId:'iUHFOGJkzmk', dur:'3:30',
+        nota:'<b>Rosado pálido.</b> Más estructura de la que parece.' },
+      { name:'Legado',          track:'Misa Criolla — Kyrie',  artist:'Ariel Ramírez',   ytId:'wHn9UUfBQi8', dur:'4:15',
+        nota:'<b>Lo que el tiempo no borró.</b>' },
+    ]
+  },
+  {
+    id:'cereza', label:'Cereza',
+    phases:[
+      { name:'Sin nombre',      track:'Cuando llora la guitarra',artist:'Atahualpa Yupanqui',ytId:'LPbJq5pnWaU',dur:'3:10',
+        nota:'<b>La cepa más plantada de Argentina.</b> La menos mencionada.' },
+      { name:'Fruta y sol',     track:'Zamba de mi esperanza', artist:'Los Chalchaleros', ytId:'OvfUF79wGp8',dur:'3:30',
+        nota:'<b>Verano norteño.</b> Rojo claro. Entrada fácil.' },
+      { name:'Buenas noches',   track:'Luna tucumana',         artist:'Atahualpa Yupanqui',ytId:'7kBTtE-F6dE',dur:'3:45',
+        nota:'<b>Se va apagando.</b> Sin apuro. Así.' },
+    ]
+  }
+];
+
+let curCepa=0, curPhase=0, isPlaying=false;
+let player=null, playerReady=false;
+let simTime=0, simMax=200, simInterval=null;
+
+function buildCepas(){
+  const g=document.getElementById('cepasGrid');
+  CEPAS.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='cepa-tag'+(i===0?' active':'');
+    b.id='ctag-'+i;
+    b.textContent=c.label;
+    b.onclick=()=>selectCepa(i);
+    g.appendChild(b);
+  });
+}
+
+function selectCepa(i){
+  curCepa=i; curPhase=0;
+  document.querySelectorAll('.cepa-tag').forEach((b,j)=>b.classList.toggle('active',j===i));
+  stopPlayback();
+  updateUI();
+}
+
+function updateUI(){
+  const p=CEPAS[curCepa].phases[curPhase];
+  const num=String(curPhase+1).padStart(2,'0');
+  document.getElementById('faseNum').textContent=num;
+  document.getElementById('faseName').textContent=p.name.toUpperCase();
+  document.getElementById('trackTitle').textContent=p.track;
+  document.getElementById('trackArtist').textContent=p.artist.toUpperCase();
+  document.getElementById('tDur').textContent=p.dur;
+  document.getElementById('tCur').textContent='0:00';
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('nota').innerHTML=p.nota;
+  renderPhases();
+}
+
+function renderPhases(){
+  const c=CEPAS[curCepa], list=document.getElementById('phaseRows');
+  list.innerHTML='';
+  c.phases.forEach((p,i)=>{
+    const row=document.createElement('div');
+    row.className='phase-row'+(i===curPhase?' active':'');
+    row.onclick=()=>{curPhase=i;updateUI();if(isPlaying)loadAndPlay();};
+    row.innerHTML=`
+      <span class="pr-num">${String(i+1).padStart(2,'0')}</span>
+      <div class="pr-info">
+        <div class="pr-name">${p.name}</div>
+        <div class="pr-track">${p.track} — ${p.artist}</div>
+      </div>
+      <span class="pr-dur">${p.dur}</span>`;
+    list.appendChild(row);
+  });
+}
+
+function togglePlay(){
+  if(!playerReady){simulateToggle();return;}
+  if(isPlaying){
+    player.pauseVideo();isPlaying=false;
+    document.getElementById('playBtn').textContent='▶';
+    clearInterval(simInterval);
+  } else { loadAndPlay(); }
+}
+
+function loadAndPlay(){
+  const p=CEPAS[curCepa].phases[curPhase];
+  if(player&&playerReady){
+    player.loadVideoById(p.ytId);
+    isPlaying=true;
+    document.getElementById('playBtn').textContent='■';
+    startProg();
+  }
+}
+
+function simulateToggle(){
+  isPlaying=!isPlaying;
+  document.getElementById('playBtn').textContent=isPlaying?'■':'▶';
+  if(isPlaying){
+    clearInterval(simInterval);
+    simInterval=setInterval(()=>{
+      simTime=Math.min(simTime+1,simMax);
+      document.getElementById('progFill').style.width=((simTime/simMax)*100).toFixed(1)+'%';
+      document.getElementById('tCur').textContent=fmt(simTime);
+      if(simTime>=simMax){clearInterval(simInterval);nextPhase();}
+    },1000);
+  } else { clearInterval(simInterval); }
+}
+
+function startProg(){
+  clearInterval(simInterval);
+  simInterval=setInterval(()=>{
+    if(!player||!playerReady)return;
+    const cur=player.getCurrentTime()||0, dur=player.getDuration()||1;
+    document.getElementById('progFill').style.width=((cur/dur)*100).toFixed(1)+'%';
+    document.getElementById('tCur').textContent=fmt(Math.floor(cur));
+    document.getElementById('tDur').textContent=fmt(Math.floor(dur));
+    if(cur>=dur-0.5&&dur>5){clearInterval(simInterval);nextPhase();}
+  },1000);
+}
+
+function stopPlayback(){
+  isPlaying=false;clearInterval(simInterval);simTime=0;
+  document.getElementById('playBtn').textContent='▶';
+  if(player&&playerReady)player.stopVideo();
+}
+
+function prevPhase(){if(curPhase>0){curPhase--;updateUI();simTime=0;if(isPlaying)loadAndPlay();}}
+function nextPhase(){
+  if(curPhase<CEPAS[curCepa].phases.length-1){curPhase++;updateUI();simTime=0;if(isPlaying)loadAndPlay();}
+  else stopPlayback();
+}
+
+function seekClick(e){
+  const pct=e.offsetX/e.currentTarget.offsetWidth;
+  if(player&&playerReady){player.seekTo(pct*(player.getDuration()||0));}
+  else{simTime=Math.floor(pct*simMax);document.getElementById('progFill').style.width=(pct*100).toFixed(1)+'%';document.getElementById('tCur').textContent=fmt(simTime);}
+}
+
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+
+function onYouTubeIframeAPIReady(){
+  player=new YT.Player('ytPlayer',{
+    height:'1',width:'1',
+    playerVars:{autoplay:0,controls:0},
+    events:{
+      onReady:()=>{playerReady=true;},
+      onStateChange:(e)=>{if(e.data===0)nextPhase();}
+    }
+  });
+}
+
+buildCepas();
+selectCepa(0);
+</script>
+</body>
+</html>
